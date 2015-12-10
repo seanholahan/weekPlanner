@@ -33,13 +33,13 @@ public class Main {
 
         LocalDateTime sleepStart = LocalDateTime.of(2015, 11, 26, 22, 0);
         LocalDateTime sleepDue = LocalDateTime.of(2015, 11, 27, 9, 0);
-        Duration sleepDuration = Duration.ofHours(14);
+        Duration sleepDuration = Duration.ofHours(8);
         Event sleep = new FlexibleEvent("Sleep", sleepStart, sleepDuration, 10, sleepDue);
 
         // TODO test with splitable event, implement splitting
 
         ArrayList<Event> events = new ArrayList<Event>();
-        events.addAll(Arrays.asList(algClass, twerkingParty, mathClass, read, dinner));
+        events.addAll(Arrays.asList(algClass, twerkingParty, mathClass, read, dinner, sleep));
         Schedule mySchedule = new Schedule(events);
 
         mySchedule.makeSchedule();
