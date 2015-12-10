@@ -9,7 +9,7 @@ public class Schedule {
     private ArrayList<Event> scheduledEvents;
 
     public Schedule(ArrayList<Event> allEvents) {
-        Collections.sort(allEvents, Event.compareByImportanceAndDuration());
+        Collections.sort(allEvents, Event.compareByImportanceAndDurationAndType());
         this.allEvents = allEvents;
     }
 

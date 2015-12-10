@@ -50,11 +50,11 @@ public class FlexibleEvent extends Event {
         }
         ArrayList<Event> conflictable = new ArrayList<Event>();
 
-        System.out.println(existing);
         // make list of possibly conflicting events
         for(Event e : existing) {
             if(e.getEnd().isAfter(this.getEarliestStart()) && e.getStart().isBefore(this.getDueDate())
-                    || e.getStart().isBefore(this.getDueDate()) && e.getEnd().isAfter(this.getEarliestStart()))
+                    || e.getStart().isBefore(this.getDueDate()) && e.getEnd().isAfter(this.getEarliestStart())
+                            || (e.getStart().isEqual(this.getEarliestStart()) && e.getEnd().isEqual(this.getDueDate()))) // TODO
             {
                 conflictable.add(e);
             }
@@ -94,6 +94,9 @@ public class FlexibleEvent extends Event {
         }
 
         // check if there is a large enough gap in the schedule for the event
+        Duration shortestGap = null;
+        LocalDateTime shortestStart = null;
+        
         for(int i = a; i < b; i++) {
             LocalDateTime gapStart, gapEnd;
 
@@ -112,13 +115,31 @@ public class FlexibleEvent extends Event {
 
             Duration gap = Duration.between(gapStart, gapEnd);
             if(gapStart.isBefore(gapEnd) && gap.compareTo(this.getDuration()) >= 0) {
-                this.setStart(gapStart);
-                //this.setStart();
-                return false;
+                if(shortestGap == null || gap.compareTo(shortestGap) <= 0) {
+                    shortestGap = gap;
+                    shortestStart = gapStart;
+                }
             }
+        }
+        if(shortestGap != null) {
+            this.setStart(shortestStart);
+            return false; 
         }
         return true;
     }
+    
+//    private LocalDateTime kickout(ArrayList<Event> conflictables) {
+//        ArrayList<Event> kickedOut = new ArrayList<Event>();
+//        for(Event e : conflictables) {
+//            if(e.getImportance() < this.getImportance()) {
+//                kickedOut.add(e);
+//                conflictables.remove(e);
+//            }
+//            
+//            // find 
+//            
+//        }
+//    }
 
     public LocalDateTime getDueDate() {
         return this.dueDate;

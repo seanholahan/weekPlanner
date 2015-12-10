@@ -27,7 +27,8 @@ public class SetEvent extends Event {
         }
         for(Event e : existing) {
             if((this.getStart().isBefore(e.getEnd()) && this.getStart().isAfter(e.getStart()))
-                    || (this.getEnd().isAfter(e.getStart()) && this.getEnd().isBefore(e.getEnd())))
+                    || (this.getEnd().isAfter(e.getStart()) && this.getEnd().isBefore(e.getEnd())
+                            || (e.getStart().isEqual(this.getStart()) && e.getEnd().isEqual(this.getEnd()))))
             {
                 return true;
             }

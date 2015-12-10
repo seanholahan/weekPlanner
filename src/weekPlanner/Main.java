@@ -12,6 +12,15 @@ public class Main {
         LocalDateTime mathStart = LocalDateTime.of(2015, 11, 26, 9, 15);
         Duration mathDuration = Duration.ofMinutes(65);
         Event mathClass = new SetEvent("Math Class", mathStart, mathDuration, 10);
+        
+        LocalDateTime advisorStart = LocalDateTime.of(2015, 11, 26, 7, 30);
+        Duration advisorDuration = Duration.ofMinutes(10);
+        Event advisor = new SetEvent("Advisor", advisorStart, advisorDuration, 9);
+        
+        LocalDateTime yogaStart = LocalDateTime.of(2015, 11, 26, 7, 0);
+        LocalDateTime yogaDue = LocalDateTime.of(2015, 11, 26, 11, 45);
+        Duration yogaDuration = Duration.ofHours(1);
+        Event yoga = new FlexibleEvent("Yoga", yogaStart, yogaDuration, 10, yogaDue);
 
         LocalDateTime algStart = LocalDateTime.of(2015, 11, 26, 11, 45);
         Duration algDuration = Duration.ofMinutes(100);
@@ -35,11 +44,17 @@ public class Main {
         LocalDateTime sleepDue = LocalDateTime.of(2015, 11, 27, 9, 0);
         Duration sleepDuration = Duration.ofHours(8);
         Event sleep = new FlexibleEvent("Sleep", sleepStart, sleepDuration, 10, sleepDue);
+        
+        LocalDateTime raveStart = LocalDateTime.of(2015, 11, 27, 0, 0);
+        Duration raveDuration = Duration.ofHours(5);
+        Event rave = new SetEvent("Rave", raveStart, raveDuration, 5);
 
         // TODO test with splitable event, implement splitting
+        //todo get yoga to occur after math class 
+        // get sleep to overtake rave
 
         ArrayList<Event> events = new ArrayList<Event>();
-        events.addAll(Arrays.asList(algClass, twerkingParty, mathClass, read, dinner, sleep));
+        events.addAll(Arrays.asList(algClass, twerkingParty, mathClass, read, dinner, sleep, rave, advisor, yoga));
         Schedule mySchedule = new Schedule(events);
 
         mySchedule.makeSchedule();

@@ -66,11 +66,21 @@ public abstract class Event {
         };
     }
 
-    public static Comparator<Event> compareByImportanceAndDuration() {
+    public static Comparator<Event> compareByImportanceAndDurationAndType() {
         return new Comparator<Event>() {
 
             @Override
             public int compare(Event o1, Event o2) {
+                
+                if(!(o1 instanceof SetEvent && o2 instanceof SetEvent) || o1 instanceof FlexibleEvent && o2 instanceof FlexibleEvent) {
+                    if(o1 instanceof SetEvent) {
+                        return -1;
+                    }
+                    else {
+                        return 1;
+                    }
+                }
+                
                 int impComp = new Integer(o1.getImportance()).compareTo(o2.getImportance());
                 if(impComp != 0) {
                     return (-1) * impComp;
