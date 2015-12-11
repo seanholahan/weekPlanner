@@ -57,9 +57,4 @@ public class SetEvent extends Event {
         return this.getStart().plusMinutes(this.getDuration().toMinutes());
     }
 
-    @Override
-    public Duration slice() {
-        return this.getDuration();
-    }
-
 }

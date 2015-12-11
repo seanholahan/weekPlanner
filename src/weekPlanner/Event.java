@@ -15,7 +15,7 @@ public abstract class Event {
     public Event(String name, Duration duration, int importance) {
         this.name = name;
         this.duration = duration;
-        this.importance = importance;
+        this.importance = Math.max(Math.min(importance, 10), 1);
     }
 
     public abstract boolean isFlexible();
@@ -37,10 +37,6 @@ public abstract class Event {
     public abstract LocalDateTime getEarliestStart();
 
     public abstract LocalDateTime getEnd();
-
-    public abstract boolean canFit();
-
-    public abstract Duration slice();
 
     public abstract Duration getMinChunkSize();
 
@@ -72,7 +68,7 @@ public abstract class Event {
             @Override
             public int compare(Event o1, Event o2) {
                 
-                if(!(o1 instanceof SetEvent && o2 instanceof SetEvent) || o1 instanceof FlexibleEvent && o2 instanceof FlexibleEvent) {
+                if((o1.isFlexible() && o2.isFlexible()) || !(o1.isFlexible() && o2.isFlexible())) {
                     if(o1 instanceof SetEvent) {
                         return -1;
                     }
