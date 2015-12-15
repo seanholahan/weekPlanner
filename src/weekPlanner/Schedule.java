@@ -32,11 +32,22 @@ public class Schedule {
 
     public void makeSchedule() {
         ArrayList<Event> finalSchedule = new ArrayList<Event>();
-        for(Event e : this.getAllEvents()) {
-            if(!e.conflict(finalSchedule)) {
-                finalSchedule.add(e);
+        for(int i = 0; i < this.getAllEvents().size(); i++) {
+            if(!this.getAllEvents().get(i).conflict(finalSchedule)) {
+                finalSchedule.add(this.getAllEvents().get(i));
+                System.out.println(finalSchedule.get(finalSchedule.size() - 1) + "\n");
             }
         }
         this.setScheduledEvents(finalSchedule);
     }
+        
+//        for(Event e : this.getAllEvents()) {
+//            if(!e.conflict(finalSchedule)) {
+//                finalSchedule.add(e);
+//                System.out.println(finalSchedule.get(finalSchedule.size() - 1) + "\n");
+//            }
+//        }
+//        this.setScheduledEvents(finalSchedule);
+//       
+//    }
 }

@@ -69,12 +69,10 @@ public abstract class Event {
             public int compare(Event o1, Event o2) {
                 
                 if((o1.isFlexible() && o2.isFlexible()) || !(o1.isFlexible() && o2.isFlexible())) {
-                    if(o1 instanceof SetEvent) {
+                    if(!o1.isFlexible()) {
                         return -1;
                     }
-                    else {
-                        return 1;
-                    }
+                    return 1;
                 }
                 
                 int impComp = new Integer(o1.getImportance()).compareTo(o2.getImportance());

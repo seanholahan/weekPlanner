@@ -37,11 +37,13 @@ public class FlexibleEvent extends Event {
         this(name, earliestStart, duration, importance, dueDate, true, minChunkSize);
     }
 
+    // is the event flexible
     @Override
     public boolean isFlexible() {
         return true;
     }
 
+    // is there a conflict? if not, this will also set the start time of an event
     @Override
     public boolean conflict(ArrayList<Event> existing) {
         
@@ -63,43 +65,44 @@ public class FlexibleEvent extends Event {
         LocalDateTime tempBegin = this.getEarliestStart();
         LocalDateTime tempEnd = this.getDueDate();
                 
-        LocalDateTime firstEventStart = conflictable.get(0).getStart();
-        LocalDateTime firstEventEnd = conflictable.get(0).getEnd();
-        LocalDateTime lastEventStart = conflictable.get(conflictable.size() - 1).getStart();
-        LocalDateTime lastEventEnd = conflictable.get(conflictable.size() - 1).getEnd();
-
-        // loop starting end ending iterations
-        int loopStart, loopEnd;
+        int[] loopBounds = getLoopBounds(conflictable, tempBegin, tempEnd);
         
+        // find the shortest gap and place the event in that space, if it exists
+        return findShortestGap(loopBounds[0], loopBounds[1], conflictable, tempBegin, tempEnd);
+    }
+    
+    // determine conflict loop start and end indices
+    private int[] getLoopBounds(ArrayList<Event> conflictable, LocalDateTime tempBegin, LocalDateTime tempEnd) {
+        
+        // loop starting end ending iterations
+        int[] loopBounds = new int[]{-1, conflictable.size()};
+                
         // set loop start
-        if(firstEventStart.isBefore(this.getEarliestStart())) {
-            tempBegin = firstEventEnd;
-            loopStart = 0;
-        }
-        else {
-            loopStart = -1;
+        Event firstConflictingEvent = conflictable.get(0);
+        if(firstConflictingEvent.getStart().isBefore(this.getEarliestStart())) {
+            tempBegin = firstConflictingEvent.getEnd();
+            loopBounds[0] = 0;
         }
         
         // set loop end
-        if(lastEventEnd.isAfter(this.getDueDate())) {
-            tempEnd = lastEventStart;
-            loopEnd = conflictable.size() - 1;
-        }
-        else {
-            loopEnd = conflictable.size();
+        Event lastConflictingEvent = conflictable.get(conflictable.size() - 1);
+        if(lastConflictingEvent.getEnd().isAfter(this.getDueDate())) {
+            tempEnd = lastConflictingEvent.getStart();
+            loopBounds[1] = conflictable.size() - 1;
         }
         
-        // find the shortest gap and place the event in that space, if it exists
-        return findShortestGap(loopStart, loopEnd, conflictable, tempBegin, tempEnd);
+        return loopBounds;
     }
     
     // if there are no conflicting events
+    
     private boolean noConflict() {
         this.setStart(this.getEarliestStart());
         return false;
     }
     
     // make list of possibly conflicting events
+    
     private ArrayList<Event> getConflictingEvents(ArrayList<Event> existing) {
         
         ArrayList<Event> conflictable = new ArrayList<Event>();
@@ -115,51 +118,28 @@ public class FlexibleEvent extends Event {
         return conflictable;
     }
     
+    // finds the shortest gap for an event
+    
     private boolean findShortestGap(int loopStart, int loopEnd, ArrayList<Event> conflictable, LocalDateTime tempBegin, LocalDateTime tempEnd) {
      
-        // keep track of shortest gap
+        // keep track of shortest gap information
         Duration shortestGap = null;
         LocalDateTime shortestStart = null;
-        
-        // find shortest gap
-        for(int i = loopStart; i < loopEnd; i++) {
-            LocalDateTime gapStart, gapEnd;
-            
-            // if one event takes up the whole block, then there is a conflict
-            
-//            if(e.getStart().isEqual(this.getEarliestStart()) && e.getEnd().isEqual(this.getDueDate())
-//                    || e.getStart().isBefore(this.getEarliestStart()) && e.getEnd().isAfter(this.getDueDate()))
-//            {
-//                return true;
-//            }  // TODO test without this
 
-            // first gap
-            if(i == -1) {
-                gapStart = tempBegin;
-                gapEnd = conflictable.get(0).getStart();
-            }
-            
-            // middle gaps
-            else if(i + 1 == conflictable.size()) {
-                gapStart = conflictable.get(i).getEnd();
-                gapEnd = tempEnd;
-            }
-            
-            // last gap
-            else {
-                gapStart = conflictable.get(i).getEnd();
-                gapEnd = conflictable.get(i + 1).getStart();
-            }
+        for(int i = loopStart; i < loopEnd; i++) {
+
+            LocalDateTime[] gapBounds = this.getGapBounds(i, conflictable, tempBegin, tempEnd);
+            LocalDateTime gapStart = gapBounds[0];
+            LocalDateTime gapEnd = gapBounds[1];
 
             // calculate the gap size and store info on the shortest gap
-            Duration gap = Duration.between(gapStart, gapEnd);
-            if(gapStart.isBefore(gapEnd) && gap.compareTo(this.getDuration()) >= 0) {
-                if(shortestGap == null || gap.compareTo(shortestGap) <= 0) {
-                    shortestGap = gap;
-                    shortestStart = gapStart;
-                }
+            Duration gap = Duration.between(gapStart, gapEnd); 
+            if(gapStart.isBefore(gapEnd) && gap.compareTo(this.getDuration()) >= 0 && (shortestGap == null || gap.compareTo(shortestGap) <= 0)) {
+                shortestGap = gap;
+                shortestStart = gapStart;
             }
         }
+        
         if(shortestStart != null) {
             this.setStart(shortestStart);
             return false;
@@ -167,46 +147,85 @@ public class FlexibleEvent extends Event {
         return true;
     }
     
+    // gets the start and end times of a gap
     
-//    private LocalDateTime kickout(ArrayList<Event> conflictables) {
-//        ArrayList<Event> kickedOut = new ArrayList<Event>();
-//        for(Event e : conflictables) {
-//            if(e.getImportance() < this.getImportance()) {
-//                kickedOut.add(e);
-//                conflictables.remove(e);
-//            }
-//            
-//            // find 
-//            
-//        }
-//    }
+    private LocalDateTime[] getGapBounds(int gapNumber, ArrayList<Event> conflictable, LocalDateTime tempBegin, LocalDateTime tempEnd) {
+        
+        int start = 0;
+        int end = 1;
+        LocalDateTime[] gapBounds = new LocalDateTime[2];
+        
+        // first gap
+        if(gapNumber == -1) {
+            gapBounds[start] = tempBegin;
+            gapBounds[end] = conflictable.get(0).getStart();
+        }
+        
+        // middle gaps
+        else if(gapNumber + 1 == conflictable.size()) {
+            gapBounds[start] = conflictable.get(gapNumber).getEnd();
+            gapBounds[end] = tempEnd;
+        }
+        
+        // last gap
+        else {
+            gapBounds[start] = conflictable.get(gapNumber).getEnd();
+            gapBounds[end] = conflictable.get(gapNumber + 1).getStart();
+        }
+        return gapBounds;
+    }
+    
+    // kicks out less important events to try to make room for this one
+    
+    private ArrayList<Event> kickout(ArrayList<Event> conflictable) {
+        ArrayList<Event> kickedOut = new ArrayList<Event>();
+        for(Event e : conflictable) {
+            if(e.getImportance() < this.getImportance()) {
+                kickedOut.add(e);
+            }
+        }
+        return kickedOut;
+    }
 
+    // returns this event's due date
+    
     public LocalDateTime getDueDate() {
         return this.dueDate;
     }
 
+    // is this event splitable
+    
     public boolean isSplitable() {
         return this.splitable;
     }
 
+    // gets this event's minimum chunk size
+    
     public Duration getMinChunkSize() {
         return this.minChunkSize;
     }
 
-    @Override
+    // gets this event's earliest allowable start time
+    
+    @Override    
     public LocalDateTime getEarliestStart() {
         return this.earliestStart;
     }
 
+    // get this event's start time
     @Override
     public LocalDateTime getStart() {
         return startTime;
     }
 
+    // sets this event's start time
+    
     private void setStart(LocalDateTime startTime) {
         this.startTime = startTime;
     }
 
+    // get's this event's end time
+    
     @Override
     public LocalDateTime getEnd() {
         return getStart().plus(this.getDuration());
