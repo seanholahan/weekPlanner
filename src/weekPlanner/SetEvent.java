@@ -12,14 +12,6 @@ public class SetEvent extends Event {
         this.startTime = startTime;
     }
 
-    public boolean canFit() {
-        return true;
-    }
-
-    public Duration getMinChunkSize() {
-        return null;
-    }
-
     @Override
     public boolean conflict(ArrayList<Event> existing) {
         if(existing == null || existing.size() == 0) {

@@ -9,7 +9,7 @@ public class Schedule {
     private ArrayList<Event> scheduledEvents;
 
     public Schedule(ArrayList<Event> allEvents) {
-        Collections.sort(allEvents, Event.compareByImportanceAndDurationAndType());
+        Collections.sort(allEvents, Event.compareByType_Importance_Duration());
         this.allEvents = allEvents;
     }
 
@@ -26,28 +26,14 @@ public class Schedule {
         this.scheduledEvents = events;
     }
 
-    public void addScheduledEvent(Event e) {
-        this.scheduledEvents.add(e);
-    }
-
     public void makeSchedule() {
         ArrayList<Event> finalSchedule = new ArrayList<Event>();
-        for(int i = 0; i < this.getAllEvents().size(); i++) {
-            if(!this.getAllEvents().get(i).conflict(finalSchedule)) {
-                finalSchedule.add(this.getAllEvents().get(i));
-                System.out.println(finalSchedule.get(finalSchedule.size() - 1) + "\n");
+        for(Event e : this.getAllEvents()) {
+            System.out.println(e.getName() + " " + e.getImportance() + " " + e.getDuration().toMinutes() + " " + e.isFlexible());
+            if(!e.conflict(finalSchedule)) {
+                finalSchedule.add(e);
             }
         }
         this.setScheduledEvents(finalSchedule);
     }
-        
-//        for(Event e : this.getAllEvents()) {
-//            if(!e.conflict(finalSchedule)) {
-//                finalSchedule.add(e);
-//                System.out.println(finalSchedule.get(finalSchedule.size() - 1) + "\n");
-//            }
-//        }
-//        this.setScheduledEvents(finalSchedule);
-//       
-//    }
 }

@@ -49,58 +49,15 @@ public class Main {
         Duration raveDuration = Duration.ofHours(5);
         Event rave = new SetEvent("Rave", raveStart, raveDuration, 5);
 
-        // TODO test with splitable event, implement splitting
-        // TODO get yoga to occur after math class 
-        // TODO get sleep to overtake rave
-
-        ArrayList<Event> events = new ArrayList<Event>();
-        events.addAll(Arrays.asList(algClass, twerkingParty, mathClass, read, dinner, sleep, rave, advisor, yoga));
+        ArrayList<Event> events = new ArrayList<Event>(Arrays.asList(algClass, 
+                twerkingParty, mathClass, read, dinner, sleep, rave, advisor, yoga));
         Schedule mySchedule = new Schedule(events);
 
         mySchedule.makeSchedule();
-        // TODO a method to add to an existing schedule
 
         System.out.println("Here is your schedule:\n");
         for(Event e : mySchedule.getScheduledEvents()) {
             System.out.println(e);
         }
-
     }
-
 }
-
-
-// if one event takes up the whole block, then there is a conflict
-
-//if(e.getStart().isEqual(this.getEarliestStart()) && e.getEnd().isEqual(this.getDueDate())
-//      || e.getStart().isBefore(this.getEarliestStart()) && e.getEnd().isAfter(this.getDueDate()))
-//{
-//  return true;
-//}  // TODO test without this
-
-
-
-
-/*
-// find the shortest gap and place the event in that space, if it exists
-if(findShortestGap(loopBounds[0], loopBounds[1], conflictable, tempBegin, tempEnd)) {
-    
-    // if there is no shortest gap (there is a conflict), kickout and try to place
-    ArrayList<Event> kickedOut = this.kickout(conflictable);
-    for(Event e : kickedOut) {
-        conflictable.remove(e);
-    }
-
-    if(conflictable.size() == 0) {
-       // add back kicked out
-       return this.noConflict(); 
-       
-    }
-    else {
-        loopBounds = getLoopBounds(conflictable, tempBegin, tempEnd);
-        
-        if(findShortestGap(loopBounds[0], loopBounds[1], conflictable, tempBegin, tempEnd)) {
-            // add back kicked out
-            return true;
-        } 
-*/

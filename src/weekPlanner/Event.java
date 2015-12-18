@@ -9,8 +9,6 @@ public abstract class Event {
     private String name;
     public Duration duration;
     private int importance; // 1-10
-    // TODO private boolean canStartLate;
-    // TODO private boolean canEndEarly;
 
     public Event(String name, Duration duration, int importance) {
         this.name = name;
@@ -38,8 +36,6 @@ public abstract class Event {
 
     public abstract LocalDateTime getEnd();
 
-    public abstract Duration getMinChunkSize();
-
     @Override
     public String toString() {
         return this.getName() + " [ " + this.getStart().getMonth() + " "
@@ -62,13 +58,15 @@ public abstract class Event {
         };
     }
 
-    public static Comparator<Event> compareByImportanceAndDurationAndType() {
+    public static Comparator<Event> compareByType_Importance_Duration() {
         return new Comparator<Event>() {
 
             @Override
             public int compare(Event o1, Event o2) {
                 
-                if((o1.isFlexible() && o2.isFlexible()) || !(o1.isFlexible() && o2.isFlexible())) {
+                boolean sameType = (o1.isFlexible() && o2.isFlexible()) || (!o1.isFlexible() && !o2.isFlexible());
+                
+                if(!sameType) {
                     if(!o1.isFlexible()) {
                         return -1;
                     }
