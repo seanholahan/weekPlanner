@@ -1,3 +1,3 @@
 # weekPlanner
 algorithm and data project
-Max > Sean
+Creates a schedule based on given events, preferred times, and deadlines
